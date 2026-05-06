@@ -32,10 +32,16 @@ function mkJelly(w: number, h: number, startMid?: boolean): Jelly {
   }
 }
 
-function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number) {
+function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number, isDark: boolean) {
+  const alphaScale = isDark ? 1 : 4.2
+  const lightnessBase = isDark ? 88 : 48
+  const lightnessShift = isDark ? 0 : -20
+  const satBase = isDark ? 85 : 78
+
   const pulse = 0.88 + Math.sin(t * 0.0014 + j.phase) * 0.12
   const bw = j.r * pulse
   const bh = j.r * 0.55
+  const a = j.alpha * alphaScale
 
   ctx.save()
   ctx.translate(j.x, j.y)
@@ -55,11 +61,15 @@ function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number) {
   ctx.closePath()
 
   // Main fill
+  const l0 = lightnessBase
+  const l1 = lightnessBase - 18 + lightnessShift
+  const l2 = lightnessBase - 30 + lightnessShift
+  const l3 = lightnessBase - 40 + lightnessShift
   const mainGrd = ctx.createRadialGradient(0, -bh * 0.9, 0, 0, -bh * 0.3, bw * 1.3)
-  mainGrd.addColorStop(0, `hsla(${j.hue - 10}, 85%, 88%, ${j.alpha * 1.7})`)
-  mainGrd.addColorStop(0.45, `hsla(${j.hue}, 80%, 70%, ${j.alpha * 1.2})`)
-  mainGrd.addColorStop(0.8, `hsla(${j.hue + 18}, 75%, 58%, ${j.alpha * 0.6})`)
-  mainGrd.addColorStop(1, `hsla(${j.hue + 30}, 70%, 48%, 0)`)
+  mainGrd.addColorStop(0,   `hsla(${j.hue - 10}, ${satBase}%, ${l0}%, ${a * 1.7})`)
+  mainGrd.addColorStop(0.45,`hsla(${j.hue},      ${satBase - 5}%, ${l1}%, ${a * 1.2})`)
+  mainGrd.addColorStop(0.8, `hsla(${j.hue + 18}, ${satBase - 10}%, ${l2}%, ${a * 0.6})`)
+  mainGrd.addColorStop(1,   `hsla(${j.hue + 30}, ${satBase - 15}%, ${l3}%, 0)`)
   ctx.fillStyle = mainGrd
   ctx.fill()
 
@@ -67,40 +77,47 @@ function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number) {
   ctx.beginPath()
   ctx.moveTo(-bw, 0)
   ctx.bezierCurveTo(-bw * 0.98, -bh * 2.5, bw * 0.98, -bh * 2.5, bw, 0)
-  ctx.strokeStyle = `hsla(${j.hue - 20}, 92%, 92%, ${j.alpha * 3})`
+  const rimL = isDark ? 92 : 38
+  ctx.strokeStyle = `hsla(${j.hue - 20}, 92%, ${rimL}%, ${a * 3})`
   ctx.lineWidth = 0.9
   ctx.stroke()
 
   // Inner highlight (light refraction on bell)
   ctx.save()
-  ctx.globalCompositeOperation = 'lighter'
+  ctx.globalCompositeOperation = isDark ? 'lighter' : 'screen'
+  const hlL = isDark ? 98 : 68
+  const hlL2 = isDark ? 80 : 55
   const ig = ctx.createRadialGradient(bw * 0.18, -bh * 1.5, 0, bw * 0.18, -bh * 1.1, bw * 0.44)
-  ig.addColorStop(0, `hsla(${j.hue - 30}, 96%, 98%, ${j.alpha * 1.1})`)
-  ig.addColorStop(1, `hsla(${j.hue}, 88%, 80%, 0)`)
+  ig.addColorStop(0, `hsla(${j.hue - 30}, 96%, ${hlL}%, ${a * 1.1})`)
+  ig.addColorStop(1, `hsla(${j.hue},      88%, ${hlL2}%, 0)`)
   ctx.beginPath()
   ctx.ellipse(bw * 0.18, -bh * 1.25, bw * 0.36, bh * 0.36, -0.35, 0, Math.PI * 2)
   ctx.fillStyle = ig
   ctx.fill()
   ctx.restore()
 
-  // Internal "gonad" structure (visible through translucent bell)
+  // Internal "gonad" structure
   ctx.save()
-  ctx.globalAlpha = j.alpha * 0.4
+  ctx.globalAlpha = a * 0.4
   const cx4 = bw * 0.04
   const cy4 = -bh * 0.85
   const gSize = j.r * 0.2
+  const gonadL = isDark ? 72 : 42
   for (let i = 0; i < 4; i++) {
     const angle = (i / 4) * Math.PI * 2 + Math.sin(t * 0.001 + j.phase) * 0.2
     const gx = cx4 + Math.cos(angle) * gSize * 0.5
     const gy = cy4 + Math.sin(angle) * gSize * 0.3
     ctx.beginPath()
     ctx.ellipse(gx, gy, gSize * 0.55, gSize * 0.35, angle, 0, Math.PI * 2)
-    ctx.fillStyle = `hsla(${j.hue + 40}, 80%, 72%, 0.8)`
+    ctx.fillStyle = `hsla(${j.hue + 40}, 80%, ${gonadL}%, 0.8)`
     ctx.fill()
   }
   ctx.restore()
 
   // Tentacles
+  const tentL0 = isDark ? 82 : 45
+  const tentL1 = isDark ? 68 : 35
+  const tentL2 = isDark ? 58 : 28
   for (let i = 0; i < j.tCount; i++) {
     const tx = -bw * 0.85 + (bw * 1.7 / (j.tCount - 1)) * i
     const tLen = j.tLengths[i]
@@ -117,9 +134,9 @@ function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number) {
     }
 
     const tGrd = ctx.createLinearGradient(0, 0, 0, tLen)
-    tGrd.addColorStop(0, `hsla(${j.hue}, 82%, 82%, ${j.alpha * 1.6})`)
-    tGrd.addColorStop(0.55, `hsla(${j.hue + 14}, 76%, 68%, ${j.alpha * 0.7})`)
-    tGrd.addColorStop(1, `hsla(${j.hue + 28}, 70%, 58%, 0)`)
+    tGrd.addColorStop(0,    `hsla(${j.hue},      82%, ${tentL0}%, ${a * 1.6})`)
+    tGrd.addColorStop(0.55, `hsla(${j.hue + 14}, 76%, ${tentL1}%, ${a * 0.7})`)
+    tGrd.addColorStop(1,    `hsla(${j.hue + 28}, 70%, ${tentL2}%, 0)`)
     ctx.strokeStyle = tGrd
     ctx.lineWidth = 0.45 + (1 - Math.abs(i - j.tCount / 2) / j.tCount) * 0.5
     ctx.stroke()
@@ -128,8 +145,18 @@ function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number) {
   ctx.restore()
 }
 
-export default function JellyfishBackground({ count = 7 }: { count?: number }) {
+interface Props {
+  count?: number
+  isDark?: boolean
+}
+
+export default function JellyfishBackground({ count = 7, isDark = true }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const isDarkRef = useRef(isDark)
+
+  useEffect(() => {
+    isDarkRef.current = isDark
+  }, [isDark])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -155,6 +182,7 @@ export default function JellyfishBackground({ count = 7 }: { count?: number }) {
     let raf: number
     const animate = (t: number) => {
       ctx.clearRect(0, 0, w, h)
+      const dark = isDarkRef.current
 
       for (const j of jellies) {
         j.y -= j.vy
@@ -165,7 +193,7 @@ export default function JellyfishBackground({ count = 7 }: { count?: number }) {
         }
         if (j.x < -j.r * 3) j.x = w + j.r
         if (j.x > w + j.r * 3) j.x = -j.r
-        drawJelly(ctx, j, t)
+        drawJelly(ctx, j, t, dark)
       }
 
       raf = requestAnimationFrame(animate)
@@ -181,7 +209,14 @@ export default function JellyfishBackground({ count = 7 }: { count?: number }) {
   return (
     <canvas
       ref={canvasRef}
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        pointerEvents: 'none',
+        mixBlendMode: isDark ? 'normal' : 'multiply',
+      }}
     />
   )
 }

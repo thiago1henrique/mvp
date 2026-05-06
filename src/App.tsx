@@ -9,6 +9,26 @@ import ContactSection from './components/Contact'
 import Footer from './components/Footer'
 import JellyfishBackground from './components/JellyfishBackground'
 
+// Smooth gradient overlay between sections — fades in and out at edges
+function SectionWave({ isDark }: { isDark: boolean }) {
+  const dark = isDark
+    ? 'rgba(8,13,10,0.88)'
+    : 'rgba(215,228,218,0.82)'
+
+  return (
+    <div
+      style={{
+        background: `linear-gradient(to bottom,
+          transparent 0%,
+          ${dark} 7%,
+          ${dark} 93%,
+          transparent 100%)`,
+        transition: 'background 0.35s ease',
+      }}
+    />
+  )
+}
+
 export default function App() {
   const [activeProfile, setActiveProfile] = useState<Profile>('data')
   const [theme, setTheme] = useState<Theme>('dark')
@@ -21,29 +41,44 @@ export default function App() {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
 
+  const bgBase = isDark ? '#05050d' : '#e8e8f2'
+  const altBg  = isDark
+    ? 'linear-gradient(to bottom, transparent 0%, rgba(8,13,10,0.90) 7%, rgba(8,13,10,0.90) 93%, transparent 100%)'
+    : 'linear-gradient(to bottom, transparent 0%, rgba(210,225,214,0.84) 7%, rgba(210,225,214,0.84) 93%, transparent 100%)'
+
   return (
     <>
-      {/* Global jellyfish background — fixed behind everything */}
+      {/* Global fixed background */}
       <div
         style={{
-          position: 'fixed', inset: 0, zIndex: 0, pointerEvents: 'none',
-          background: isDark ? '#05050d' : '#e8e8f2',
+          position: 'fixed',
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: 'none',
+          background: bgBase,
+          transition: 'background 0.35s ease',
         }}
       >
-        {isDark && <JellyfishBackground count={8} />}
+        <JellyfishBackground count={8} isDark={isDark} />
       </div>
 
       <div style={{ position: 'relative', zIndex: 1 }}>
         <Header activeProfile={activeProfile} onToggle={toggle} theme={theme} onThemeToggle={toggleTheme} />
         <main style={{ flex: 1 }}>
           <HeroSection activeProfile={activeProfile} theme={theme} />
-          <div style={{ backgroundColor: 'var(--bg-alt)' }}>
-            <SkillsSection activeProfile={activeProfile} />
+
+          {/* Skills — smooth gradient band */}
+          <div style={{ background: altBg, transition: 'background 0.35s ease' }}>
+            <SkillsSection activeProfile={activeProfile} isDark={isDark} />
           </div>
-          <ProjectsSection activeProfile={activeProfile} />
-          <div style={{ backgroundColor: 'var(--bg-alt)' }}>
-            <ResearchSection />
+
+          <ProjectsSection activeProfile={activeProfile} isDark={isDark} />
+
+          {/* Research — smooth gradient band */}
+          <div style={{ background: altBg, transition: 'background 0.35s ease' }}>
+            <ResearchSection isDark={isDark} />
           </div>
+
           <ContactSection />
         </main>
         <Footer />

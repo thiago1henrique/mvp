@@ -3,6 +3,7 @@ import { BookOpen, Lightbulb, FlaskConical, ArrowUpRight } from 'lucide-react'
 import { research } from '../data/profiles'
 import type { ResearchItem } from '../data/profiles'
 import { SectionHeader } from './Skills'
+import ThreeScene from './ThreeScene'
 
 type LucideIcon = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>
 
@@ -29,9 +30,16 @@ const cardVariant = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' as const } },
 }
 
-export default function ResearchSection() {
+interface ResearchProps {
+  isDark?: boolean
+}
+
+export default function ResearchSection({ isDark = true }: ResearchProps) {
   return (
     <section id="pesquisa" style={{ padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+      {/* Three.js data helix — decorative background */}
+      <ThreeScene isDark={isDark} variant="helix" opacity={isDark ? 0.32 : 0.18} />
+
       <div
         style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 1,

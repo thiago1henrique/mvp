@@ -5,9 +5,11 @@ import {
 } from 'lucide-react'
 import { skills } from '../data/profiles'
 import type { Profile } from '../data/profiles'
+import ThreeScene from './ThreeScene'
 
 interface Props {
   activeProfile: Profile
+  isDark?: boolean
 }
 
 type LucideIcon = React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>
@@ -37,11 +39,14 @@ const cardVariant = {
 
 const GREEN = '#22C55E'
 
-export default function SkillsSection({ activeProfile }: Props) {
+export default function SkillsSection({ activeProfile, isDark = true }: Props) {
   const groups = skills[activeProfile]
 
   return (
     <section id="skills" style={{ padding: '96px 24px', position: 'relative', overflow: 'hidden' }}>
+      {/* Three.js neural network — decorative background */}
+      <ThreeScene isDark={isDark} variant="sphere" opacity={isDark ? 0.38 : 0.22} />
+
       <div
         style={{
           position: 'absolute', top: 0, left: 0, right: 0, height: 1,

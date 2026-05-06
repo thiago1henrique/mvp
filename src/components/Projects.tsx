@@ -7,6 +7,7 @@ import { SectionHeader } from './Skills'
 
 interface Props {
   activeProfile: Profile
+  isDark?: boolean
 }
 
 export default function ProjectsSection({ activeProfile }: Props) {
