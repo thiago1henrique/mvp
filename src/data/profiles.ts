@@ -67,6 +67,12 @@ export const projects: Record<Profile, Project[]> = {
   ],
   data: [
     {
+      title: 'Dashboard Analítico · Data Studio',
+      description: 'Relatório interativo de análise de dados construído no Google Data Studio. Explore métricas e visualizações diretamente no painel abaixo.',
+      techs: ['Data Studio', 'Google Data Studio', 'BI', 'Data Visualization'],
+      embedUrl: 'https://datastudio.google.com/embed/reporting/b732b899-8344-47ee-9e2f-fa9bd0b82bd9/page/G0ytF',
+    },
+    {
       title: 'CardioAI',
       description: 'Modelo preditivo para previsão de doenças cardíacas com alta acurácia, deploy interativo via Streamlit.',
       techs: ['Random Forest', 'Scikit-learn', 'Streamlit', 'Pandas'],
@@ -75,12 +81,6 @@ export const projects: Record<Profile, Project[]> = {
       title: 'Detecção de Tumores Cerebrais',
       description: 'Classificação de imagens de ressonância magnética (RM) com Deep Learning usando arquitetura Xception. Acurácia superior a 95%.',
       techs: ['TensorFlow', 'Keras', 'CNNs', 'Xception'],
-    },
-    {
-      title: 'Dashboard Analítico · Looker Studio',
-      description: 'Relatório interativo de análise de dados construído no Google Looker Studio. Explore métricas e visualizações diretamente no painel abaixo.',
-      techs: ['Looker Studio', 'Google Data Studio', 'BI', 'Data Visualization'],
-      embedUrl: 'https://datastudio.google.com/embed/reporting/b732b899-8344-47ee-9e2f-fa9b',
     },
   ],
 }

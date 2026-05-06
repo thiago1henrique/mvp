@@ -1,8 +1,8 @@
-import { motion } from 'framer-motion'
+import { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ExternalLink, BarChart2 } from 'lucide-react'
 import { projects } from '../data/profiles'
 import type { Profile, Project } from '../data/profiles'
-import TechTicker from './TechTicker'
 import { SectionHeader } from './Skills'
 
 interface Props {
@@ -12,142 +12,348 @@ interface Props {
 
 export default function ProjectsSection({ activeProfile }: Props) {
   const list = projects[activeProfile]
+  const [activeIdx, setActiveIdx] = useState(0)
+
+  useEffect(() => { setActiveIdx(0) }, [activeProfile])
+
+  const project = list[activeIdx]
+  const num = String(activeIdx + 1).padStart(2, '0')
 
   return (
     <section id="projetos" style={{ padding: '96px 0', position: 'relative', overflow: 'hidden' }}>
-      <div
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-          background: 'linear-gradient(to right, transparent, rgba(255,23,68,0.3), transparent)',
-        }}
-      />
+      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px' }}>
 
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '0 24px', marginBottom: 40 }}>
         <SectionHeader label="Projetos em Destaque" />
-        <p style={{
-          marginTop: 10,
-          fontFamily: 'Montserrat, sans-serif',
-          fontSize: 13,
-          color: 'var(--text4)',
-          letterSpacing: 0.3,
-        }}>
-          Arraste para explorar →
-        </p>
-      </div>
 
-      <motion.div
-        className="projects-scroll"
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true, amount: 0.05 }}
-        variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.13 } } }}
-      >
-        {list.map((project, index) => (
-          <ProjectCard key={project.title} project={project} index={index} />
-        ))}
-      </motion.div>
+        {/* Tab buttons */}
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 28, marginBottom: 24 }}>
+          {list.map((p, i) => {
+            const active = activeIdx === i
+            return (
+              <button
+                key={p.title}
+                onClick={() => setActiveIdx(i)}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 9,
+                  fontFamily: 'Outfit, sans-serif', fontSize: 13,
+                  fontWeight: active ? 700 : 500,
+                  color: active ? '#fff' : 'var(--text3)',
+                  backgroundColor: active ? '#FF1744' : 'rgba(255,255,255,0.03)',
+                  border: `1px solid ${active ? '#FF1744' : 'rgba(255,255,255,0.1)'}`,
+                  borderRadius: 10, padding: '9px 18px',
+                  cursor: 'pointer', outline: 'none',
+                  transition: 'all 0.2s ease',
+                }}
+                onMouseEnter={e => {
+                  if (!active) {
+                    e.currentTarget.style.color = 'var(--text)'
+                    e.currentTarget.style.borderColor = 'rgba(255,23,68,0.4)'
+                    e.currentTarget.style.backgroundColor = 'rgba(255,23,68,0.06)'
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (!active) {
+                    e.currentTarget.style.color = 'var(--text3)'
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)'
+                  }
+                }}
+              >
+                <span style={{
+                  fontFamily: 'Montserrat, sans-serif', fontSize: 10, fontWeight: 600,
+                  color: active ? 'rgba(255,255,255,0.65)' : 'var(--text4)',
+                  letterSpacing: 0.5,
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                {p.title}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Expanded content panel */}
+        <div style={{
+          borderRadius: 20,
+          overflow: 'hidden',
+          border: '1px solid var(--border)',
+          backgroundColor: 'var(--card)',
+          backdropFilter: 'blur(16px)',
+          boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
+        }}>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={`${activeProfile}-${activeIdx}`}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -12 }}
+              transition={{ duration: 0.26, ease: 'easeOut' }}
+            >
+              {project.embedUrl
+                ? <EmbedLayout project={project} num={num} />
+                : <NormalLayout project={project} num={num} />}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+      </div>
     </section>
   )
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
-  const num = String(index + 1).padStart(2, '0')
-
+/* ── Normal layout — visual left / info right ── */
+function NormalLayout({ project, num }: { project: Project; num: string }) {
   return (
-    <motion.div
-      variants={{
-        hidden: { opacity: 0, x: 40 },
-        visible: { opacity: 1, x: 0, transition: { duration: 0.55, ease: 'easeOut' } },
-      }}
-      style={{
-        flexShrink: 0,
-        width: project.embedUrl ? 'min(860px, calc(100vw - 48px))' : 'min(700px, calc(100vw - 48px))',
-        scrollSnapAlign: 'start',
-        borderRadius: 16,
+    <div className="project-detail-grid">
+
+      {/* Visual col */}
+      <div style={{
+        position: 'relative',
+        minHeight: 360,
         overflow: 'hidden',
-        border: '1px solid var(--border)',
-        backgroundColor: 'var(--card)',
-        backdropFilter: 'blur(16px)',
-        boxShadow: '0 24px 64px rgba(0,0,0,0.3)',
-        transition: 'border-color 0.25s, box-shadow 0.25s',
-      }}
-      whileHover={{
-        borderColor: 'rgba(255,23,68,0.32)',
-        boxShadow: '0 32px 80px rgba(0,0,0,0.4), 0 0 40px rgba(255,23,68,0.06)',
-      }}
-    >
-      {project.embedUrl ? (
-        <EmbedLayout project={project} num={num} />
-      ) : (
-        <NormalLayout project={project} num={num} />
-      )}
-    </motion.div>
+        background: 'linear-gradient(140deg, #14080d 0%, #100810 55%, #0c0a18 100%)',
+        borderRight: '1px solid var(--border)',
+      }}>
+        {/* Grid */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage:
+            'linear-gradient(rgba(255,23,68,0.055) 1px, transparent 1px), ' +
+            'linear-gradient(90deg, rgba(255,23,68,0.055) 1px, transparent 1px)',
+          backgroundSize: '30px 30px',
+        }} />
+        {/* Glow */}
+        <div style={{
+          position: 'absolute',
+          top: -80, left: '50%', transform: 'translateX(-50%)',
+          width: 400, height: 320,
+          background: 'radial-gradient(ellipse, rgba(255,23,68,0.12) 0%, transparent 70%)',
+          pointerEvents: 'none',
+        }} />
+        {/* Number watermark */}
+        <span style={{
+          position: 'absolute', bottom: -20, right: 8,
+          fontFamily: 'Outfit, sans-serif', fontSize: 180, fontWeight: 800,
+          color: 'rgba(255,23,68,0.045)',
+          lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
+          letterSpacing: -6,
+        }}>
+          {num}
+        </span>
+        {/* Tech chips */}
+        <div style={{
+          position: 'absolute', inset: 0,
+          display: 'flex', flexWrap: 'wrap',
+          alignItems: 'center', justifyContent: 'center',
+          gap: 10, padding: '24px',
+        }}>
+          {project.techs.map(tech => (
+            <span key={tech} style={{
+              fontFamily: 'Montserrat, sans-serif', fontSize: 12, fontWeight: 600,
+              color: 'rgba(255,255,255,0.72)',
+              background: 'rgba(255,23,68,0.08)',
+              border: '1px solid rgba(255,23,68,0.2)',
+              borderRadius: 8, padding: '6px 14px',
+              backdropFilter: 'blur(6px)',
+              letterSpacing: 0.2,
+            }}>
+              {tech}
+            </span>
+          ))}
+        </div>
+        <div className="scan-line" />
+      </div>
+
+      {/* Info col */}
+      <div style={{
+        padding: '36px 36px 32px',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', gap: 16,
+      }}>
+        <span style={{
+          fontFamily: 'Montserrat, sans-serif', fontSize: 10,
+          color: '#FF1744', letterSpacing: 2.5, textTransform: 'uppercase',
+        }}>
+          Projeto {num}
+        </span>
+        <h3 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: 'clamp(1.3rem, 2.2vw, 1.65rem)',
+          fontWeight: 800, color: 'var(--text)', margin: 0, lineHeight: 1.2,
+        }}>
+          {project.title}
+        </h3>
+        <p style={{
+          fontFamily: 'Montserrat, sans-serif', fontSize: 14,
+          color: 'var(--text3)', lineHeight: 1.75, margin: 0,
+        }}>
+          {project.description}
+        </p>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+          {project.techs.map(tech => (
+            <span key={tech} style={{
+              fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 500,
+              color: '#FF1744', backgroundColor: 'rgba(255,23,68,0.08)',
+              border: '1px solid rgba(255,23,68,0.18)',
+              borderRadius: 999, padding: '3px 10px',
+            }}>
+              {tech}
+            </span>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+          {project.demo ? (
+            <ActionBtn href={project.demo} primary label="Ver Projeto" icon={<ExternalLink size={13} />} />
+          ) : (
+            <ActionBtn
+              href={project.github}
+              primary={!!project.github}
+              label="Ver no GitHub"
+              icon={<GithubIcon />}
+              disabled={!project.github}
+            />
+          )}
+          {project.github && project.demo && (
+            <ActionBtn href={project.github} label="GitHub" icon={<GithubIcon />} />
+          )}
+        </div>
+      </div>
+    </div>
   )
 }
 
-/* ── Embed (Data Studio iframe) layout ── */
+/* ── Embed layout — iframe left / info right ── */
 function EmbedLayout({ project, num }: { project: Project; num: string }) {
+  const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  const directUrl = project.embedUrl?.replace(
+    'datastudio.google.com/embed/reporting/',
+    'lookerstudio.google.com/reporting/',
+  )
+
+  // Fix: clicking inside iframe (Looker pagination) causes parent to scroll up.
+  // We save scroll position on focus and restore it the next frame.
+  const handleFocus = () => {
+    const saved = window.scrollY
+    requestAnimationFrame(() => window.scrollTo({ top: saved, behavior: 'instant' }))
+  }
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {/* Iframe area */}
-      <div style={{ position: 'relative', background: 'rgba(10,10,16,0.6)' }}>
-        <div
-          style={{
-            display: 'flex', alignItems: 'center', gap: 10,
-            padding: '10px 16px',
-            borderBottom: '1px solid var(--border)',
-            background: 'rgba(10,10,16,0.4)',
-          }}
-        >
+    <div className="project-embed-grid">
+
+      {/* Desktop iframe col — hidden on mobile via CSS */}
+      <div className="embed-iframe-col" style={{
+        display: 'flex', flexDirection: 'column',
+        borderRight: '1px solid var(--border)',
+      }}>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 10,
+          padding: '10px 16px',
+          borderBottom: '1px solid var(--border)',
+          background: 'rgba(10,10,16,0.4)',
+          flexShrink: 0,
+        }}>
           <BarChart2 size={13} color="#FF1744" />
-          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, color: 'var(--text3)', letterSpacing: 1 }}>
-            LOOKER STUDIO · LIVE DASHBOARD
+          <span style={{
+            fontFamily: 'Montserrat, sans-serif', fontSize: 11,
+            color: 'var(--text3)', letterSpacing: 1,
+          }}>
+            DATA STUDIO · LIVE DASHBOARD
           </span>
-          <span
-            style={{
-              marginLeft: 'auto',
-              width: 6, height: 6, borderRadius: '50%',
-              backgroundColor: '#22c55e',
-              animation: 'pulse-status 2.2s ease-in-out infinite',
-              display: 'inline-block',
-            }}
-          />
+          <span style={{
+            marginLeft: 'auto',
+            width: 6, height: 6, borderRadius: '50%',
+            backgroundColor: '#22c55e',
+            animation: 'pulse-status 2.2s ease-in-out infinite',
+            display: 'inline-block',
+          }} />
         </div>
         <iframe
+          ref={iframeRef}
           src={project.embedUrl}
-          style={{ width: '100%', height: 380, border: 'none', display: 'block' }}
+          onFocus={handleFocus}
+          style={{ width: '100%', flex: 1, minHeight: 420, border: 'none', display: 'block' }}
           allowFullScreen
           sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
           title={project.title}
         />
       </div>
 
-      {/* Project info */}
-      <div style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
-          <div>
-            <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, color: '#FF1744', letterSpacing: 2.5, textTransform: 'uppercase' }}>
-              Projeto {num}
-            </span>
-            <h3 style={{ fontFamily: 'Outfit, sans-serif', fontSize: '1.15rem', fontWeight: 800, color: 'var(--text)', margin: '4px 0 0', lineHeight: 1.2 }}>
-              {project.title}
-            </h3>
+      {/* Info col */}
+      <div style={{
+        padding: '36px 32px',
+        display: 'flex', flexDirection: 'column',
+        justifyContent: 'center', gap: 16,
+      }}>
+
+        {/* Mobile-only area: scaled preview + notice */}
+        <div className="embed-mobile-area">
+          <MobileIframePreview src={project.embedUrl ?? ''} />
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', gap: 10,
+            padding: '14px 16px',
+            borderRadius: '0 0 10px 10px',
+            background: 'rgba(255,23,68,0.04)',
+            border: '1px solid rgba(255,23,68,0.13)',
+            borderTop: 'none',
+            textAlign: 'center',
+          }}>
+            <p style={{
+              fontFamily: 'Montserrat, sans-serif', fontSize: 11.5,
+              color: 'var(--text3)', margin: 0, lineHeight: 1.55,
+            }}>
+              Para melhor experiência, acesse no desktop
+            </p>
+            {directUrl && (
+              <a
+                href={directUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 7,
+                  fontFamily: 'Outfit, sans-serif', fontSize: 12, fontWeight: 700,
+                  color: '#fff', backgroundColor: '#FF1744',
+                  border: '1px solid #FF1744',
+                  borderRadius: 8, padding: '9px 18px', textDecoration: 'none',
+                  transition: 'background 0.18s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#c8001a' }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#FF1744' }}
+              >
+                <ExternalLink size={12} /> Abrir no Data Studio
+              </a>
+            )}
           </div>
         </div>
-        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: 'var(--text3)', lineHeight: 1.7, margin: 0 }}>
+
+        <span style={{
+          fontFamily: 'Montserrat, sans-serif', fontSize: 10,
+          color: '#FF1744', letterSpacing: 2.5, textTransform: 'uppercase',
+        }}>
+          Projeto {num}
+        </span>
+        <h3 style={{
+          fontFamily: 'Outfit, sans-serif',
+          fontSize: 'clamp(1.2rem, 2vw, 1.5rem)',
+          fontWeight: 800, color: 'var(--text)', margin: 0, lineHeight: 1.25,
+        }}>
+          {project.title}
+        </h3>
+        <p style={{
+          fontFamily: 'Montserrat, sans-serif', fontSize: 13.5,
+          color: 'var(--text3)', lineHeight: 1.75, margin: 0,
+        }}>
           {project.description}
         </p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
           {project.techs.map(tech => (
-            <span
-              key={tech}
-              style={{
-                fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 500,
-                color: '#FF1744', backgroundColor: 'rgba(255,23,68,0.08)',
-                border: '1px solid rgba(255,23,68,0.18)',
-                borderRadius: 999, padding: '3px 10px',
-              }}
-            >
+            <span key={tech} style={{
+              fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 500,
+              color: '#FF1744', backgroundColor: 'rgba(255,23,68,0.08)',
+              border: '1px solid rgba(255,23,68,0.18)',
+              borderRadius: 999, padding: '3px 10px',
+            }}>
               {tech}
             </span>
           ))}
@@ -157,189 +363,111 @@ function EmbedLayout({ project, num }: { project: Project; num: string }) {
   )
 }
 
-/* ── Normal (GIF + info) layout ── */
-function NormalLayout({ project, num }: { project: Project; num: string }) {
+/* ── Mobile iframe preview — scales iframe to fit container width ── */
+function MobileIframePreview({ src }: { src: string }) {
+  const wrapRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(0.34)
+  const NATIVE_W = 960
+  const NATIVE_H = 540
+
+  useEffect(() => {
+    const update = () => {
+      if (wrapRef.current) setScale(wrapRef.current.offsetWidth / NATIVE_W)
+    }
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+
   return (
-    <div className="project-card-inner">
-      {/* LEFT — GIF placeholder + tech ticker */}
-      <div style={{ display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--border)' }}>
-        <div style={{ flex: 1, position: 'relative', minHeight: 200 }} className="gif-placeholder-bg">
-          <div className="scan-line" />
-          <div
-            style={{
-              position: 'absolute', inset: 0,
-              backgroundImage:
-                'linear-gradient(rgba(255,23,68,0.04) 1px, transparent 1px), ' +
-                'linear-gradient(90deg, rgba(255,23,68,0.04) 1px, transparent 1px)',
-              backgroundSize: '28px 28px',
-            }}
-          />
-          <div
-            style={{
-              position: 'absolute', inset: 0,
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center', gap: 10,
-            }}
-          >
-            <div
-              style={{
-                width: 38, height: 38, borderRadius: '50%',
-                border: '1.5px solid rgba(255,23,68,0.4)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-              }}
-            >
-              <div
-                style={{
-                  width: 0, height: 0,
-                  borderTop: '7px solid transparent',
-                  borderBottom: '7px solid transparent',
-                  borderLeft: '12px solid rgba(255,23,68,0.55)',
-                  marginLeft: 3,
-                }}
-              />
-            </div>
-            <span
-              style={{
-                fontFamily: 'Montserrat, sans-serif', fontSize: 9,
-                color: 'rgba(255,23,68,0.45)', letterSpacing: 2.5, textTransform: 'uppercase',
-              }}
-            >
-              GIF Preview
-            </span>
-          </div>
-          <span
-            style={{
-              position: 'absolute', top: 10, left: 10,
-              fontFamily: 'Montserrat, sans-serif', fontSize: 9,
-              color: 'rgba(255,23,68,0.45)',
-              backgroundColor: 'rgba(22,22,29,0.75)',
-              padding: '2px 8px', borderRadius: 4,
-              border: '1px solid rgba(255,23,68,0.12)',
-            }}
-          >
-            ● REC
-          </span>
-        </div>
-
-        <div style={{ backgroundColor: 'rgba(10,10,16,0.9)', padding: '6px 0', borderTop: '1px solid rgba(255,23,68,0.07)' }}>
-          <TechTicker items={project.techs} speed={11} />
-        </div>
+    <div ref={wrapRef} style={{
+      position: 'relative',
+      width: '100%',
+      height: Math.round(NATIVE_H * scale),
+      overflow: 'hidden',
+      borderRadius: '10px 10px 0 0',
+      border: '1px solid rgba(255,23,68,0.13)',
+      borderBottom: 'none',
+    }}>
+      {/* Scaled iframe */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0,
+        width: NATIVE_W, height: NATIVE_H,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+      }}>
+        <iframe
+          src={src}
+          width={NATIVE_W}
+          height={NATIVE_H}
+          style={{ border: 'none', display: 'block' }}
+          sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+          title="preview"
+        />
       </div>
-
-      {/* RIGHT — Project info */}
-      <div style={{ padding: 28, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', gap: 20, position: 'relative', minHeight: 240 }}>
-        <span
-          style={{
-            position: 'absolute', top: 14, right: 18,
-            fontFamily: 'Outfit, sans-serif',
-            fontSize: 72, fontWeight: 800,
-            color: 'rgba(255,23,68,0.05)',
-            lineHeight: 1, userSelect: 'none', pointerEvents: 'none',
-          }}
-        >
-          {num}
-        </span>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, color: '#FF1744', letterSpacing: 2.5, textTransform: 'uppercase' }}>
-            Projeto {num}
-          </span>
-          <h3
-            style={{
-              fontFamily: 'Outfit, sans-serif',
-              fontSize: 'clamp(1.1rem, 1.8vw, 1.4rem)',
-              fontWeight: 800, color: 'var(--text)',
-              lineHeight: 1.2, margin: 0,
-            }}
-          >
-            {project.title}
-          </h3>
-          <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13.5, color: 'var(--text3)', lineHeight: 1.75, margin: 0 }}>
-            {project.description}
-          </p>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
-            {project.techs.map(tech => (
-              <span
-                key={tech}
-                style={{
-                  fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 500,
-                  color: '#FF1744', backgroundColor: 'rgba(255,23,68,0.08)',
-                  border: '1px solid rgba(255,23,68,0.18)',
-                  borderRadius: 999, padding: '3px 10px',
-                }}
-              >
-                {tech}
-              </span>
-            ))}
-          </div>
-
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-            {project.demo ? (
-              <a
-                href={project.demo}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 7,
-                  fontFamily: 'Outfit, sans-serif', fontSize: 13, fontWeight: 700,
-                  color: '#fff', backgroundColor: '#FF1744',
-                  border: '1px solid #FF1744', borderRadius: 8,
-                  padding: '9px 20px', textDecoration: 'none',
-                  transition: 'background 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#b01030' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#FF1744' }}
-              >
-                <ExternalLink size={13} /> Ver Projeto
-              </a>
-            ) : (
-              <a
-                href={project.github ?? '#'}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 7,
-                  fontFamily: 'Outfit, sans-serif', fontSize: 13, fontWeight: 700,
-                  color: '#fff', backgroundColor: '#FF1744',
-                  border: '1px solid #FF1744', borderRadius: 8,
-                  padding: '9px 20px', textDecoration: 'none',
-                  transition: 'background 0.2s',
-                  opacity: project.github ? 1 : 0.4,
-                  pointerEvents: project.github ? 'auto' : 'none',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#b01030' }}
-                onMouseLeave={e => { e.currentTarget.style.background = '#FF1744' }}
-              >
-                <GithubIcon /> Ver no GitHub
-              </a>
-            )}
-            {project.github && project.demo && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 600,
-                  color: 'var(--text2)',
-                  background: 'var(--card)',
-                  border: '1px solid var(--border2)',
-                  borderRadius: 8, padding: '9px 18px', textDecoration: 'none',
-                  transition: 'color 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => { e.currentTarget.style.color = '#FF1744'; e.currentTarget.style.borderColor = 'rgba(255,23,68,0.35)' }}
-                onMouseLeave={e => { e.currentTarget.style.color = 'var(--text2)'; e.currentTarget.style.borderColor = 'var(--border2)' }}
-              >
-                <GithubIcon /> GitHub
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
+      {/* Transparent overlay — blocks interaction so it stays read-only */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 1 }} />
     </div>
+  )
+}
+
+/* ── Action button ── */
+function ActionBtn({ href, label, icon, primary = false, disabled = false }: {
+  href?: string
+  label: string
+  icon: React.ReactNode
+  primary?: boolean
+  disabled?: boolean
+}) {
+  const base: React.CSSProperties = {
+    display: 'inline-flex', alignItems: 'center', gap: 7,
+    fontFamily: primary ? 'Outfit, sans-serif' : 'Montserrat, sans-serif',
+    fontSize: 13, fontWeight: primary ? 700 : 600,
+    borderRadius: 9, padding: '10px 20px', textDecoration: 'none',
+    transition: 'background 0.18s, color 0.18s, border-color 0.18s, transform 0.15s',
+  }
+
+  if (disabled || !href) {
+    return (
+      <span style={{
+        ...base, color: 'var(--text4)',
+        backgroundColor: 'rgba(255,255,255,0.03)',
+        border: '1px solid rgba(255,255,255,0.06)',
+        opacity: 0.5, cursor: 'default',
+      }}>
+        {icon} {label}
+      </span>
+    )
+  }
+
+  if (primary) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer"
+        style={{ ...base, color: '#fff', backgroundColor: '#FF1744', border: '1px solid #FF1744' }}
+        onMouseEnter={e => { e.currentTarget.style.background = '#c8001a'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+        onMouseLeave={e => { e.currentTarget.style.background = '#FF1744'; e.currentTarget.style.transform = 'none' }}
+      >
+        {icon} {label}
+      </a>
+    )
+  }
+
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer"
+      style={{ ...base, color: 'var(--text2)', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.1)' }}
+      onMouseEnter={e => {
+        e.currentTarget.style.color = '#FF1744'
+        e.currentTarget.style.borderColor = 'rgba(255,23,68,0.35)'
+        e.currentTarget.style.transform = 'translateY(-1px)'
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.color = 'var(--text2)'
+        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'
+        e.currentTarget.style.transform = 'none'
+      }}
+    >
+      {icon} {label}
+    </a>
   )
 }
 

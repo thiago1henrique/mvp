@@ -47,12 +47,6 @@ export default function SkillsSection({ activeProfile, isDark = true }: Props) {
       {/* Three.js neural network — decorative background */}
       <ThreeScene isDark={isDark} variant="sphere" opacity={isDark ? 0.38 : 0.22} />
 
-      <div
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-          background: `linear-gradient(to right, transparent, ${GREEN}55, transparent)`,
-        }}
-      />
 
       <div style={{ maxWidth: 960, margin: '0 auto' }}>
         <SectionHeader label="Skills Técnicas" accentColor={GREEN} />

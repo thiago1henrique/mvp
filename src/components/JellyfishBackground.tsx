@@ -33,7 +33,7 @@ function mkJelly(w: number, h: number, startMid?: boolean): Jelly {
 }
 
 function drawJelly(ctx: CanvasRenderingContext2D, j: Jelly, t: number, isDark: boolean) {
-  const alphaScale = isDark ? 1 : 4.2
+  const alphaScale = isDark ? 1 : 1.8
   const lightnessBase = isDark ? 88 : 48
   const lightnessShift = isDark ? 0 : -20
   const satBase = isDark ? 85 : 78

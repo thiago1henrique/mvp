@@ -43,9 +43,10 @@
 html {
   scroll-behavior: smooth;
   background: #05050d;
+  overflow-x: hidden;
 }
-
 body {
+  overflow-x: hidden;
   background-color: transparent;
   color: var(--text);
   font-family: 'Montserrat', sans-serif;
@@ -208,12 +209,6 @@ body::after {
   }
 
   .tilt-badge { display: none !important; }
-
-  /* Sections get more breathing room on mobile */
-  section {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-  }
 }
 
 @media (max-width: 480px) {
@@ -233,23 +228,47 @@ body::after {
   scrollbar-width: thin;
   scrollbar-color: rgba(255,23,68,0.4) rgba(255,255,255,0.04);
   padding-bottom: 20px;
-  padding-left: max(20px, calc((100% - 960px) / 2));
-  padding-right: max(20px, calc((100% - 960px) / 2));
+  padding-left: max(24px, calc((100% - 960px) / 2));
+  padding-right: max(24px, calc((100% - 960px) / 2));
 }
 .projects-scroll::-webkit-scrollbar { height: 4px; }
 .projects-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); border-radius: 2px; }
 .projects-scroll::-webkit-scrollbar-thumb { background: rgba(255,23,68,0.4); border-radius: 2px; }
 
-/* ── Project card inner grid ─────────────────────── */
-.project-card-inner {
+
+/* ── Project detail grids ────────────────────────── */
+.project-detail-grid {
   display: grid;
-  grid-template-columns: 1fr;
-  height: 100%;
+  grid-template-columns: 42% 58%;
 }
-@media (min-width: 500px) {
-  .project-card-inner {
-    grid-template-columns: 220px 1fr;
+.project-embed-grid {
+  display: grid;
+  grid-template-columns: 60% 40%;
+}
+
+/* iframe col: visible on desktop; mobile area hidden on desktop */
+.embed-iframe-col  { display: flex; }
+.embed-mobile-area { display: none; }
+
+@media (max-width: 680px) {
+  .project-detail-grid,
+  .project-embed-grid {
+    grid-template-columns: 1fr;
   }
+  .project-detail-grid > :first-child {
+    border-right: none !important;
+    border-bottom: 1px solid var(--border);
+    min-height: 220px !important;
+  }
+  /* hide full iframe col, show mobile preview area */
+  .embed-iframe-col  { display: none !important; }
+  .embed-mobile-area { display: block !important; margin-bottom: 4px; }
+}
+
+/* ── Research card mobile ────────────────────────── */
+@media (max-width: 560px) {
+  .research-card { padding: 20px 18px 20px 20px !important; }
+  .research-icon { display: none !important; }
 }
 
 /* ── Contact & Research grid ─────────────────────── */

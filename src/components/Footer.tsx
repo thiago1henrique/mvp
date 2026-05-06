@@ -5,14 +5,14 @@ export default function Footer() {
   return (
     <footer
       style={{
-        backgroundColor: 'var(--bg-alt)',
-        borderTop: '1px solid var(--border)',
+        backgroundColor: 'rgba(6,6,14,0.97)',
+        borderTop: '1px solid rgba(255,255,255,0.07)',
         padding: '40px 24px',
         backdropFilter: 'blur(12px)',
       }}
     >
       <div style={{ maxWidth: 960, margin: '0 auto', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-        <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 18, color: 'var(--text)', letterSpacing: '-0.5px' }}>
+        <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: 18, color: '#f2f2f5', letterSpacing: '-0.5px' }}>
           débora<span style={{ color: '#FF1744' }}>.</span>
         </span>
 
@@ -22,8 +22,8 @@ export default function Footer() {
           <FooterLink href={`mailto:${hero.email}`} icon={<Mail size={18} />} label="Email" />
         </div>
 
-        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: 'var(--text4)' }}>
-          © 2025 Débora Alves · Feito com React & Vite
+        <p style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, color: '#4b5563' }}>
+          © 2026 Débora Alves · Feito com React & Vite
         </p>
       </div>
     </footer>
@@ -37,7 +37,7 @@ function FooterLink({ href, icon, label }: { href: string; icon: React.ReactNode
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      style={{ color: 'var(--text3)', transition: 'color 0.2s' }}
+      style={{ color: '#6b7280', transition: 'color 0.2s' }}
       onMouseEnter={e => (e.currentTarget.style.color = '#FF1744')}
       onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}
     >

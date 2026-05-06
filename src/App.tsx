@@ -44,7 +44,7 @@ export default function App() {
   const bgBase = isDark ? '#05050d' : '#e8e8f2'
   const altBg  = isDark
     ? 'linear-gradient(to bottom, transparent 0%, rgba(8,13,10,0.90) 7%, rgba(8,13,10,0.90) 93%, transparent 100%)'
-    : 'linear-gradient(to bottom, transparent 0%, rgba(210,225,214,0.84) 7%, rgba(210,225,214,0.84) 93%, transparent 100%)'
+    : 'linear-gradient(to bottom, transparent 0%, rgba(224,224,238,0.72) 7%, rgba(224,224,238,0.72) 93%, transparent 100%)'
 
   return (
     <>

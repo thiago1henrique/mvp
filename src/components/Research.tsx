@@ -40,12 +40,6 @@ export default function ResearchSection({ isDark = true }: ResearchProps) {
       {/* Three.js data helix — decorative background */}
       <ThreeScene isDark={isDark} variant="helix" opacity={isDark ? 0.32 : 0.18} />
 
-      <div
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-          background: `linear-gradient(to right, transparent, ${GREEN}55, transparent)`,
-        }}
-      />
 
       <div style={{ maxWidth: 960, margin: '0 auto' }}>
         <SectionHeader label="Pesquisa & Artigos" accentColor={GREEN} />
@@ -83,6 +77,7 @@ function ResearchCard({ item }: { item: ResearchItem }) {
   return (
     <motion.div
       variants={cardVariant}
+      className="research-card"
       style={{
         background: 'var(--card)',
         border: '1px solid var(--border)',
@@ -112,6 +107,7 @@ function ResearchCard({ item }: { item: ResearchItem }) {
 
       {/* Icon badge */}
       <div
+        className="research-icon"
         style={{
           width: 48, height: 48, borderRadius: 14,
           background: `${accent}18`,

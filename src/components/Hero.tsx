@@ -108,9 +108,9 @@ export default function HeroSection({ activeProfile, theme }: Props) {
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 7,
                 fontSize: 12, fontFamily: 'Montserrat, sans-serif',
-                color: '#86efac',
-                background: 'rgba(34,197,94,0.08)',
-                border: '1px solid rgba(34,197,94,0.2)',
+                color: isDark ? '#86efac' : '#15803d',
+                background: isDark ? 'rgba(34,197,94,0.08)' : 'rgba(34,197,94,0.1)',
+                border: `1px solid ${isDark ? 'rgba(34,197,94,0.2)' : 'rgba(34,197,94,0.35)'}`,
                 borderRadius: 999, padding: '5px 14px', letterSpacing: 0.2,
               }}
             >
@@ -220,21 +220,23 @@ export default function HeroSection({ activeProfile, theme }: Props) {
             transition={{ duration: 0.45, delay: 0.28 }}
             style={{ display: 'flex', flexWrap: 'wrap', gap: 10, marginTop: 4 }}
           >
-            <button
-              onClick={() => window.print()}
+            <a
+              href={activeProfile === 'dev' ? '/D%C3%A9bora%20Alves-dev.pdf' : '/DeboraAlves-analise-dados.pdf'}
+              download
               style={{
                 display: 'inline-flex', alignItems: 'center', gap: 8,
                 fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 13,
                 letterSpacing: 0.3, color: '#fff',
                 backgroundColor: ACCENT, border: `1px solid ${ACCENT}`,
                 borderRadius: 9, padding: '11px 22px', cursor: 'pointer',
+                textDecoration: 'none',
                 transition: 'background 0.18s, transform 0.15s',
               }}
               onMouseEnter={e => { e.currentTarget.style.background = '#c8001a'; e.currentTarget.style.transform = 'translateY(-1px)' }}
               onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'none' }}
             >
               <FileDown size={14} /> Download CV
-            </button>
+            </a>
             <OutlineLink href={hero.github} icon={<GithubIcon />} label="GitHub" />
             <OutlineLink href={hero.linkedin} icon={<LinkedinIcon />} label="LinkedIn" />
           </motion.div>
@@ -287,10 +289,10 @@ export default function HeroSection({ activeProfile, theme }: Props) {
           style={{
             fontFamily: 'Montserrat, sans-serif', fontSize: 10,
             color: isDark ? '#4b5563' : '#9ca3af',
-            letterSpacing: 2.5, textTransform: 'uppercase',
+            letterSpacing: 1.2, textTransform: 'uppercase',
           }}
         >
-          scroll
+          desça a página
         </span>
         <div
           style={{

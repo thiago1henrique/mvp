@@ -164,8 +164,10 @@ export default function ThreeScene({ isDark = true, variant = 'sphere', opacity 
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-    renderer.setSize(W, H)
+    renderer.setSize(W, H, false)           // false = don't set CSS px dimensions
     renderer.setClearColor(0x000000, 0)
+    // Let CSS control display size so canvas never overflows its container
+    renderer.domElement.style.cssText = 'width:100%;height:100%;display:block;'
     mount.appendChild(renderer.domElement)
 
     const built = variant === 'sphere'
@@ -194,7 +196,7 @@ export default function ThreeScene({ isDark = true, variant = 'sphere', opacity 
       const h = mount.clientHeight
       camera.aspect = w / h
       camera.updateProjectionMatrix()
-      renderer.setSize(w, h)
+      renderer.setSize(w, h, false)
     }
     window.addEventListener('resize', handleResize, { passive: true })
 

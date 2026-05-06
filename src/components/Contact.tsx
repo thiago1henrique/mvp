@@ -6,12 +6,6 @@ import { SectionHeader } from './Skills'
 export default function ContactSection() {
   return (
     <section id="contato" style={{ padding: '96px 24px 80px', position: 'relative' }}>
-      <div
-        style={{
-          position: 'absolute', top: 0, left: 0, right: 0, height: 1,
-          background: 'linear-gradient(to right, transparent, rgba(220,20,60,0.3), transparent)',
-        }}
-      />
 
       <div style={{ maxWidth: 960, margin: '0 auto' }}>
         <SectionHeader label="Contato" />
