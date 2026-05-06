@@ -1,23 +1,25 @@
-import { useRef, useEffect, lazy, Suspense } from 'react'
+import { useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Mail, MapPin, FileDown } from 'lucide-react'
 import CodeBlock from './CodeBlock'
 import DataDashboard from './DataDashboard'
 import { hero } from '../data/profiles'
-import type { Profile } from '../data/profiles'
-
-const VantaBackground = lazy(() => import('./VantaBackground'))
+import type { Profile, Theme } from '../data/profiles'
 
 interface Props {
   activeProfile: Profile
+  theme: Theme
 }
+
+const ACCENT = '#FF1744'
 
 const BADGES: Record<Profile, [string, string, string]> = {
   dev:  ['TypeScript', 'React 18', 'Node.js'],
   data: ['Python 3.11', '94.2% acc', 'scikit-learn'],
 }
 
-export default function HeroSection({ activeProfile }: Props) {
+export default function HeroSection({ activeProfile, theme }: Props) {
+  const isDark = theme === 'dark'
   const panelRef  = useRef<HTMLDivElement>(null)
   const b1Ref     = useRef<HTMLDivElement>(null)
   const b2Ref     = useRef<HTMLDivElement>(null)
@@ -49,30 +51,32 @@ export default function HeroSection({ activeProfile }: Props) {
   return (
     <section
       id="sobre"
+      className="hero-section"
       style={{
         position: 'relative',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
         overflow: 'hidden',
-        background: '#16161d',
+        background: isDark
+          ? 'rgba(6,6,14,0.55)'
+          : 'rgba(240,240,250,0.82)',
+        transition: 'background 0.3s ease',
       }}
     >
-      {/* Vanta WAVES — WebGL fluid background */}
-      <VantaBackground />
-
-      {/* Dark gradient overlay — preserves readability & depth */}
+      {/* Gradient overlays */}
       <div
         style={{
           position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
-          background:
-            'radial-gradient(ellipse 70% 55% at 65% 20%, rgba(220,20,60,0.06) 0%, transparent 60%), ' +
-            'linear-gradient(to bottom, rgba(22,22,29,0.55) 0%, rgba(22,22,29,0.18) 45%, rgba(22,22,29,0.65) 100%)',
+          background: isDark
+            ? 'radial-gradient(ellipse 70% 55% at 65% 20%, rgba(255,23,68,0.06) 0%, transparent 60%), ' +
+              'linear-gradient(to bottom, rgba(6,6,14,0.3) 0%, rgba(6,6,14,0.1) 45%, rgba(6,6,14,0.5) 100%)'
+            : 'radial-gradient(ellipse 70% 55% at 65% 20%, rgba(255,23,68,0.04) 0%, transparent 60%)',
         }}
       />
 
-      <Blob top={-80}   right={160} size={420} opacity={0.1} dur={10} />
-      <Blob bottom={60} left={40}   size={300} opacity={0.08} dur={13} delay={-4} />
+      <Blob top={-80}   right={160} size={420} opacity={0.09} dur={10} />
+      <Blob bottom={60} left={40}   size={300} opacity={0.07} dur={13} delay={-4} />
 
       <div
         style={{
@@ -80,7 +84,7 @@ export default function HeroSection({ activeProfile }: Props) {
           margin: '0 auto',
           width: '100%',
           padding: '0 24px',
-          paddingTop: 120,
+          paddingTop: 96,
           paddingBottom: 80,
           display: 'grid',
           gridTemplateColumns: '1fr 1fr',
@@ -102,24 +106,17 @@ export default function HeroSection({ activeProfile }: Props) {
           >
             <span
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 7,
-                fontSize: 12,
-                fontFamily: 'Montserrat, sans-serif',
+                display: 'inline-flex', alignItems: 'center', gap: 7,
+                fontSize: 12, fontFamily: 'Montserrat, sans-serif',
                 color: '#86efac',
                 background: 'rgba(34,197,94,0.08)',
                 border: '1px solid rgba(34,197,94,0.2)',
-                borderRadius: 999,
-                padding: '5px 14px',
-                letterSpacing: 0.2,
+                borderRadius: 999, padding: '5px 14px', letterSpacing: 0.2,
               }}
             >
               <span
                 style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
+                  width: 6, height: 6, borderRadius: '50%',
                   backgroundColor: '#22c55e',
                   animation: 'pulse-status 2.2s ease-in-out infinite',
                   display: 'inline-block',
@@ -142,24 +139,24 @@ export default function HeroSection({ activeProfile }: Props) {
                 fontWeight: 800,
                 lineHeight: 1.06,
                 letterSpacing: '-2px',
-                color: '#f5f5f5',
+                color: 'var(--text)',
                 margin: 0,
               }}
             >
               Débora
               <br />
-              <span style={{ color: '#DC143C', display: 'inline-block' }}>Alves</span>
+              <span style={{ color: ACCENT, display: 'inline-block' }}>Alves</span>
             </h1>
             <p
               style={{
                 marginTop: 8,
                 fontFamily: 'Montserrat, sans-serif',
                 fontSize: 13,
-                color: '#4b5563',
+                color: 'var(--text4)',
                 letterSpacing: 0.3,
               }}
             >
-              21 anos · Recife, Pernambuco
+              21 anos
             </p>
           </motion.div>
 
@@ -175,7 +172,7 @@ export default function HeroSection({ activeProfile }: Props) {
                 fontFamily: 'Outfit, sans-serif',
                 fontSize: 'clamp(1rem, 2.2vw, 1.2rem)',
                 fontWeight: 700,
-                color: '#DC143C',
+                color: ACCENT,
                 margin: 0,
                 letterSpacing: '-0.3px',
               }}
@@ -196,7 +193,7 @@ export default function HeroSection({ activeProfile }: Props) {
                 fontFamily: 'Montserrat, sans-serif',
                 fontSize: 15,
                 lineHeight: 1.75,
-                color: '#6b7280',
+                color: 'var(--text3)',
                 margin: 0,
                 maxWidth: 440,
               }}
@@ -226,23 +223,15 @@ export default function HeroSection({ activeProfile }: Props) {
             <button
               onClick={() => window.print()}
               style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: 8,
-                fontFamily: 'Outfit, sans-serif',
-                fontWeight: 700,
-                fontSize: 13,
-                letterSpacing: 0.3,
-                color: '#fff',
-                backgroundColor: '#DC143C',
-                border: '1px solid #DC143C',
-                borderRadius: 9,
-                padding: '11px 22px',
-                cursor: 'pointer',
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: 13,
+                letterSpacing: 0.3, color: '#fff',
+                backgroundColor: ACCENT, border: `1px solid ${ACCENT}`,
+                borderRadius: 9, padding: '11px 22px', cursor: 'pointer',
                 transition: 'background 0.18s, transform 0.15s',
               }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#b01030'; e.currentTarget.style.transform = 'translateY(-1px)' }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#DC143C'; e.currentTarget.style.transform = 'none' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#c8001a'; e.currentTarget.style.transform = 'translateY(-1px)' }}
+              onMouseLeave={e => { e.currentTarget.style.background = ACCENT; e.currentTarget.style.transform = 'none' }}
             >
               <FileDown size={14} /> Download CV
             </button>
@@ -254,22 +243,18 @@ export default function HeroSection({ activeProfile }: Props) {
         {/* ── RIGHT: 3D Visual ── */}
         <div style={{ position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 
-          {/* Floating depth badge — top right */}
           <div ref={b1Ref} className="tilt-badge" style={{ position: 'absolute', top: 24, right: -10, zIndex: 20 }}>
             <BadgeChip text={BADGES[activeProfile][0]} />
           </div>
 
-          {/* Floating depth badge — bottom left */}
           <div ref={b2Ref} className="tilt-badge" style={{ position: 'absolute', bottom: 100, left: -12, zIndex: 20 }}>
             <BadgeChip text={BADGES[activeProfile][1]} />
           </div>
 
-          {/* Floating depth badge — top left */}
           <div ref={b3Ref} className="tilt-badge" style={{ position: 'absolute', top: 100, left: -12, zIndex: 20 }}>
             <BadgeChip text={BADGES[activeProfile][2]} />
           </div>
 
-          {/* 3D tilt wrapper */}
           <div ref={panelRef} className="tilt-panel" style={{ width: '100%' }}>
             <AnimatePresence mode="wait">
               <motion.div
@@ -279,10 +264,8 @@ export default function HeroSection({ activeProfile }: Props) {
                 exit={{ opacity: 0, scale: 0.96, y: -16 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
                 style={{
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  filter: 'drop-shadow(0 0 48px rgba(220,20,60,0.14))',
+                  display: 'flex', justifyContent: 'center', alignItems: 'center',
+                  filter: `drop-shadow(0 0 48px ${ACCENT}22)`,
                 }}
               >
                 {activeProfile === 'dev' ? <CodeBlock /> : <DataDashboard />}
@@ -295,33 +278,24 @@ export default function HeroSection({ activeProfile }: Props) {
       {/* Scroll indicator */}
       <div
         style={{
-          position: 'absolute',
-          bottom: 28,
-          left: '50%',
-          zIndex: 2,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: 5,
+          position: 'absolute', bottom: 28, left: '50%', zIndex: 2,
+          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
           animation: 'bounce-down 2.2s ease-in-out infinite',
         }}
       >
         <span
           style={{
-            fontFamily: 'Montserrat, sans-serif',
-            fontSize: 10,
-            color: '#374151',
-            letterSpacing: 2.5,
-            textTransform: 'uppercase',
+            fontFamily: 'Montserrat, sans-serif', fontSize: 10,
+            color: isDark ? '#4b5563' : '#9ca3af',
+            letterSpacing: 2.5, textTransform: 'uppercase',
           }}
         >
           scroll
         </span>
         <div
           style={{
-            width: 1,
-            height: 36,
-            background: 'linear-gradient(to bottom, rgba(220,20,60,0.6), transparent)',
+            width: 1, height: 36,
+            background: `linear-gradient(to bottom, ${ACCENT}99, transparent)`,
           }}
         />
       </div>
@@ -335,24 +309,19 @@ function BadgeChip({ text }: { text: string }) {
   return (
     <span
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        fontFamily: '"Cascadia Code", "Fira Code", ui-monospace, monospace',
-        fontSize: 11,
-        fontWeight: 600,
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        fontFamily: 'Montserrat, sans-serif',
+        fontSize: 11, fontWeight: 600,
         color: '#e2e8f0',
-        background: 'rgba(10,10,16,0.9)',
+        background: 'rgba(10,10,18,0.88)',
         backdropFilter: 'blur(14px)',
-        border: '1px solid rgba(220,20,60,0.28)',
-        borderRadius: 8,
-        padding: '6px 12px',
-        boxShadow: '0 6px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.03)',
-        whiteSpace: 'nowrap',
-        letterSpacing: 0.3,
+        border: `1px solid rgba(255,23,68,0.28)`,
+        borderRadius: 8, padding: '6px 12px',
+        boxShadow: '0 6px 24px rgba(0,0,0,0.5)',
+        whiteSpace: 'nowrap', letterSpacing: 0.3,
       }}
     >
-      <span style={{ color: '#DC143C', fontSize: 7, lineHeight: 1 }}>◆</span>
+      <span style={{ color: '#FF1744', fontSize: 7, lineHeight: 1 }}>◆</span>
       {text}
     </span>
   )
@@ -370,10 +339,9 @@ function Blob({ top, bottom, left, right, size, opacity, dur, delay = 0 }: {
         bottom: bottom !== undefined ? bottom : undefined,
         left:   left   !== undefined ? left   : undefined,
         right:  right  !== undefined ? right  : undefined,
-        width: size,
-        height: size,
+        width: size, height: size,
         borderRadius: '50%',
-        background: '#DC143C',
+        background: '#FF1744',
         opacity,
         filter: 'blur(72px)',
         animation: `blob-float ${dur}s ease-in-out infinite`,
@@ -389,19 +357,15 @@ function Chip({ icon, text, href }: { icon: React.ReactNode; text: string; href?
   const inner = (
     <span
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 6,
-        fontSize: 12,
-        fontFamily: 'Montserrat, sans-serif',
+        display: 'inline-flex', alignItems: 'center', gap: 6,
+        fontSize: 12, fontFamily: 'Montserrat, sans-serif',
         color: '#6b7280',
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.07)',
-        borderRadius: 999,
-        padding: '5px 12px',
+        borderRadius: 999, padding: '5px 12px',
       }}
     >
-      <span style={{ color: '#DC143C' }}>{icon}</span>
+      <span style={{ color: '#FF1744' }}>{icon}</span>
       {text}
     </span>
   )
@@ -417,24 +381,17 @@ function OutlineLink({ href, icon, label }: { href: string; icon: React.ReactNod
       target="_blank"
       rel="noopener noreferrer"
       style={{
-        display: 'inline-flex',
-        alignItems: 'center',
-        gap: 7,
-        fontFamily: 'Outfit, sans-serif',
-        fontWeight: 600,
-        fontSize: 13,
-        letterSpacing: 0.2,
-        color: '#9ca3af',
+        display: 'inline-flex', alignItems: 'center', gap: 7,
+        fontFamily: 'Outfit, sans-serif', fontWeight: 600, fontSize: 13,
+        letterSpacing: 0.2, color: '#9ca3af',
         background: 'rgba(255,255,255,0.04)',
         border: '1px solid rgba(255,255,255,0.09)',
-        borderRadius: 9,
-        padding: '11px 20px',
-        textDecoration: 'none',
+        borderRadius: 9, padding: '11px 20px', textDecoration: 'none',
         transition: 'color 0.18s, border-color 0.18s, transform 0.15s',
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.color = '#DC143C'
-        e.currentTarget.style.borderColor = 'rgba(220,20,60,0.4)'
+        e.currentTarget.style.color = '#FF1744'
+        e.currentTarget.style.borderColor = 'rgba(255,23,68,0.4)'
         e.currentTarget.style.transform = 'translateY(-1px)'
       }}
       onMouseLeave={e => {
