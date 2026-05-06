@@ -22,12 +22,32 @@ const ACCENT = '#FF1744'
 export default function Header({ activeProfile, onToggle, theme, onThemeToggle }: Props) {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [activeSection, setActiveSection] = useState('sobre')
   const isDark = theme === 'dark'
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 20)
     window.addEventListener('scroll', fn, { passive: true })
     return () => window.removeEventListener('scroll', fn)
+  }, [])
+
+  // Scroll spy: mark the section whose top just passed 30% of viewport height
+  useEffect(() => {
+    let ticking = false
+    const update = () => {
+      const threshold = window.scrollY + window.innerHeight * 0.3
+      let current = 'sobre'
+      for (const { href } of NAV) {
+        const el = document.getElementById(href.slice(1))
+        if (el && el.offsetTop - 80 <= threshold) current = href.slice(1)
+      }
+      setActiveSection(current)
+      ticking = false
+    }
+    const onScroll = () => { if (!ticking) { requestAnimationFrame(update); ticking = true } }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   // Close menu on any scroll
@@ -92,21 +112,38 @@ export default function Header({ activeProfile, onToggle, theme, onThemeToggle }
 
           {/* Nav — desktop only */}
           <nav className="nav-desktop">
-            {NAV.map(({ label, href }) => (
-              <a
-                key={label}
-                href={href}
-                style={{
-                  fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 500,
-                  color: 'var(--text3)', textDecoration: 'none',
-                  letterSpacing: 0.2, transition: 'color 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.color = ACCENT)}
-                onMouseLeave={e => (e.currentTarget.style.color = 'var(--text3)')}
-              >
-                {label}
-              </a>
-            ))}
+            {NAV.map(({ label, href }) => {
+              const isActive = activeSection === href.slice(1)
+              return (
+                <a
+                  key={label}
+                  href={href}
+                  style={{
+                    position: 'relative',
+                    fontFamily: 'Montserrat, sans-serif', fontSize: 13,
+                    fontWeight: isActive ? 700 : 500,
+                    color: isActive ? ACCENT : 'var(--text3)',
+                    textDecoration: 'none',
+                    letterSpacing: 0.2,
+                    transition: 'color 0.2s, font-weight 0.2s',
+                    paddingBottom: 4,
+                  }}
+                  onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = ACCENT }}
+                  onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'var(--text3)' }}
+                >
+                  {label}
+                  {isActive && (
+                    <span style={{
+                      position: 'absolute', bottom: -1, left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: 4, height: 4, borderRadius: '50%',
+                      backgroundColor: ACCENT,
+                      boxShadow: `0 0 6px ${ACCENT}cc`,
+                    }} />
+                  )}
+                </a>
+              )
+            })}
           </nav>
 
           {/* Controls */}
@@ -238,24 +275,37 @@ export default function Header({ activeProfile, onToggle, theme, onThemeToggle }
 
         {/* Nav links */}
         <nav style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {NAV.map(({ label, href }) => (
-            <a
-              key={label}
-              href={href}
-              onClick={() => setMenuOpen(false)}
-              style={{
-                fontFamily: 'Outfit, sans-serif', fontSize: 26, fontWeight: 800,
-                color: 'var(--text)', textDecoration: 'none', letterSpacing: '-0.5px',
-                padding: '12px 0',
-                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
-                transition: 'color 0.2s, padding-left 0.2s',
-              }}
-              onMouseEnter={e => { e.currentTarget.style.color = ACCENT; e.currentTarget.style.paddingLeft = '6px' }}
-              onMouseLeave={e => { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.paddingLeft = '0' }}
-            >
-              {label}
-            </a>
-          ))}
+          {NAV.map(({ label, href }) => {
+            const isActive = activeSection === href.slice(1)
+            return (
+              <a
+                key={label}
+                href={href}
+                onClick={() => setMenuOpen(false)}
+                style={{
+                  fontFamily: 'Outfit, sans-serif', fontSize: 26, fontWeight: 800,
+                  color: isActive ? ACCENT : 'var(--text)',
+                  textDecoration: 'none', letterSpacing: '-0.5px',
+                  padding: '12px 0',
+                  paddingLeft: isActive ? '6px' : '0',
+                  borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}`,
+                  transition: 'color 0.2s, padding-left 0.2s',
+                  display: 'flex', alignItems: 'center', gap: 10,
+                }}
+                onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = ACCENT; e.currentTarget.style.paddingLeft = '6px' } }}
+                onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = 'var(--text)'; e.currentTarget.style.paddingLeft = '0' } }}
+              >
+                {isActive && (
+                  <span style={{
+                    width: 5, height: 5, borderRadius: '50%',
+                    backgroundColor: ACCENT, flexShrink: 0,
+                    boxShadow: `0 0 8px ${ACCENT}cc`,
+                  }} />
+                )}
+                {label}
+              </a>
+            )
+          })}
         </nav>
 
         {/* Drawer controls */}

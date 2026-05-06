@@ -147,17 +147,6 @@ export default function HeroSection({ activeProfile, theme }: Props) {
               <br />
               <span style={{ color: ACCENT, display: 'inline-block' }}>Alves</span>
             </h1>
-            <p
-              style={{
-                marginTop: 8,
-                fontFamily: 'Montserrat, sans-serif',
-                fontSize: 13,
-                color: 'var(--text4)',
-                letterSpacing: 0.3,
-              }}
-            >
-              21 anos
-            </p>
           </motion.div>
 
           {/* Dynamic subtitle */}
@@ -277,30 +266,6 @@ export default function HeroSection({ activeProfile, theme }: Props) {
         </div>
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        style={{
-          position: 'absolute', bottom: 28, left: '50%', zIndex: 2,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
-          animation: 'bounce-down 2.2s ease-in-out infinite',
-        }}
-      >
-        <span
-          style={{
-            fontFamily: 'Montserrat, sans-serif', fontSize: 10,
-            color: isDark ? '#4b5563' : '#9ca3af',
-            letterSpacing: 1.2, textTransform: 'uppercase',
-          }}
-        >
-          desça a página
-        </span>
-        <div
-          style={{
-            width: 1, height: 36,
-            background: `linear-gradient(to bottom, ${ACCENT}99, transparent)`,
-          }}
-        />
-      </div>
     </section>
   )
 }

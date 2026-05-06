@@ -67,17 +67,11 @@ export default function App() {
         <main style={{ flex: 1 }}>
           <HeroSection activeProfile={activeProfile} theme={theme} />
 
-          {/* Skills — smooth gradient band */}
-          <div style={{ background: altBg, transition: 'background 0.35s ease' }}>
-            <SkillsSection activeProfile={activeProfile} isDark={isDark} />
-          </div>
+          <SkillsSection activeProfile={activeProfile} isDark={isDark} />
 
           <ProjectsSection activeProfile={activeProfile} isDark={isDark} />
 
-          {/* Research — smooth gradient band */}
-          <div style={{ background: altBg, transition: 'background 0.35s ease' }}>
-            <ResearchSection isDark={isDark} />
-          </div>
+          <ResearchSection isDark={isDark} />
 
           <ContactSection />
         </main>
